@@ -28,7 +28,7 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop</groupId>
-  <artifactId>server</artifactId>
+  <artifactId>sqoop-server</artifactId>
   <name>Sqoop Server</name>
   <packaging>war</packaging>
 

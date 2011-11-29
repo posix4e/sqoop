@@ -28,6 +28,6 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop</groupId>
-  <artifactId>dist</artifactId>
+  <artifactId>sqoop-dist</artifactId>
   <name>Sqoop Distribution</name>
 </project>

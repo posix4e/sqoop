@@ -28,7 +28,7 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop.connector</groupId>
-  <artifactId>connector-mysql-jdbc</artifactId>
+  <artifactId>sqoop-connector-mysql-jdbc</artifactId>
   <name>MySQL JDBC Connector</name>
 
   <dependencies>

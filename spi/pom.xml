@@ -28,6 +28,6 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop</groupId>
-  <artifactId>spi</artifactId>
+  <artifactId>sqoop-spi</artifactId>
   <name>Sqoop SPI</name>
 </project>

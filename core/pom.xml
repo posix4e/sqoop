@@ -28,7 +28,7 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop</groupId>
-  <artifactId>core</artifactId>
+  <artifactId>sqoop-core</artifactId>
   <name>Sqoop Core</name>
 
   <dependencies>

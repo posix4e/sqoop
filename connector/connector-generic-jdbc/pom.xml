@@ -28,7 +28,7 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop.connector</groupId>
-  <artifactId>connector-generic-jdbc</artifactId>
+  <artifactId>sqoop-connector-generic-jdbc</artifactId>
   <name>Generic JDBC Connector</name>
 
   <dependencies>

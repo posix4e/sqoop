@@ -28,7 +28,7 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop</groupId>
-  <artifactId>docs</artifactId>
+  <artifactId>sqoop-docs</artifactId>
   <name>Sqoop Documentation</name>
   <packaging>war</packaging>
 

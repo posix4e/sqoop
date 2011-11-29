@@ -28,7 +28,7 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop</groupId>
-  <artifactId>client</artifactId>
+  <artifactId>sqoop-client</artifactId>
   <name>Sqoop Client</name>
 
   <dependencies>

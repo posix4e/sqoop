@@ -28,7 +28,7 @@ limitations under the License.
   </parent>
 
   <groupId>org.apache.sqoop.connector</groupId>
-  <artifactId>connector-mysql-fastpath</artifactId>
+  <artifactId>sqoop-connector-mysql-fastpath</artifactId>
   <name>MySQL Fastpath Connector</name>
 
   <dependencies>
