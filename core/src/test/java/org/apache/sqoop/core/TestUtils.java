@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -39,9 +40,11 @@ public class TestUtils {
    * directory. This is useful for running tests without necessarily having to
    * create an installation layout.
    *
+   * @param config any properties that you would like to set in the system
    * @throws Exception
    */
-  public static void setupTestConfiguration() throws Exception {
+  public static void setupTestConfiguration(Properties config) throws Exception
+  {
     File tempDir = null;
     File targetDir = new File("target");
     if (targetDir.exists() && targetDir.isDirectory()) {
@@ -63,7 +66,7 @@ public class TestUtils {
     }
 
     File bootconfigFile = new File(tempConfigDir,
-        SqoopConfiguration.FILENAME_BOOTSTRAP_CONFIG);
+        ConfigurationConstants.FILENAME_BOOTCFG_FILE);
 
     if (!bootconfigFile.createNewFile()) {
       throw new Exception("Unable to create config file: " + bootconfigFile);
@@ -123,7 +126,7 @@ public class TestUtils {
       }
     }
 
-    System.setProperty(SqoopConfiguration.SYSPROP_CONFIG_DIR,
+    System.setProperty(ConfigurationConstants.SYSPROP_CONFIG_DIR,
         tempConfigDirPath);
   }
 

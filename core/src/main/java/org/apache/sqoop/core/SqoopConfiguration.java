@@ -21,31 +21,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-public class SqoopConfiguration {
-
-  public static final String SYSPROP_CONFIG_DIR = "sqoop.config.dir";
-  public static final String FILENAME_BOOTSTRAP_CONFIG =
-      "sqoop_bootstrap.properties";
-
-  public static final String BOOTPROP_CONFIG_PROVIDER = "sqoop.config.provider";
+public final class SqoopConfiguration {
 
   public static final Logger LOG = Logger.getLogger(SqoopConfiguration.class);
-
-  private static final String PREFIX_GLOBAL_CONFIG = "org.apache.sqoop.";
-
-  private static final String PREFIX_LOG_CONFIG = PREFIX_GLOBAL_CONFIG
-      + "log4j.";
 
   private static File configDir = null;
   private static boolean initialized = false;
   private static ConfigurationProvider provider = null;
-  private static Map<String, String> config;
+  private static Map<String, String> config = null;
 
   public synchronized static void initialize() {
     if (initialized) {
@@ -53,10 +43,11 @@ public class SqoopConfiguration {
       return;
     }
 
-    String configDirPath = System.getProperty(SYSPROP_CONFIG_DIR);
+    String configDirPath = System.getProperty(
+        ConfigurationConstants.SYSPROP_CONFIG_DIR);
     if (configDirPath == null || configDirPath.trim().length() == 0) {
       throw new SqoopException(CoreError.CORE_0001, "Environment variable "
-          + SYSPROP_CONFIG_DIR + " is not set.");
+          + ConfigurationConstants.SYSPROP_CONFIG_DIR + " is not set.");
     }
 
     configDir = new File(configDirPath);
@@ -68,7 +59,7 @@ public class SqoopConfiguration {
     try {
       String configDirCanonicalPath = configDir.getCanonicalPath();
       bootstrapConfigFilePath = configDirCanonicalPath
-              + "/" + FILENAME_BOOTSTRAP_CONFIG;
+              + "/" + ConfigurationConstants.FILENAME_BOOTCFG_FILE;
 
     } catch (IOException ex) {
       throw new SqoopException(CoreError.CORE_0001, configDirPath, ex);
@@ -91,12 +82,12 @@ public class SqoopConfiguration {
     }
 
     String configProviderClassName = bootstrapProperties.getProperty(
-        BOOTPROP_CONFIG_PROVIDER);
+        ConfigurationConstants.BOOTCFG_CONFIG_PROVIDER);
 
     if (configProviderClassName == null
         || configProviderClassName.trim().length() == 0) {
       throw new SqoopException(
-          CoreError.CORE_0003, BOOTPROP_CONFIG_PROVIDER);
+          CoreError.CORE_0003, ConfigurationConstants.BOOTCFG_CONFIG_PROVIDER);
     }
 
     Class<?> configProviderClass = null;
@@ -112,8 +103,8 @@ public class SqoopConfiguration {
         try {
           configProviderClass = ctxLoader.loadClass(configProviderClassName);
         } catch (ClassNotFoundException cnfe) {
-          LOG.warn("Exception while trying to load configuration provider",
-              cnfe);
+          LOG.warn("Exception while trying to load configuration provider: "
+              + configProviderClassName, cnfe);
         }
       }
     }
@@ -129,6 +120,7 @@ public class SqoopConfiguration {
           configProviderClassName, ex);
     }
 
+    // Initialize the configuration provider
     provider.initialize(configDir, bootstrapProperties);
     refreshConfiguration();
     provider.registerListener(new CoreConfigurationListener());
@@ -136,19 +128,23 @@ public class SqoopConfiguration {
     initialized = true;
   }
 
-  public synchronized static void registerListener(
-      ConfigurationListener listener) {
+  public synchronized static Context getContext() {
     if (!initialized) {
       throw new SqoopException(CoreError.CORE_0007);
     }
-    provider.registerListener(listener);
+
+    Map<String,String> parameters = new HashMap<String, String>();
+    parameters.putAll(config);
+
+    return new Context(parameters);
   }
 
   private synchronized static void configureLogging() {
     Properties props = new Properties();
     for (String key : config.keySet()) {
-      if (key.startsWith(PREFIX_LOG_CONFIG)) {
-        String logConfigKey = key.substring(PREFIX_GLOBAL_CONFIG.length());
+      if (key.startsWith(ConfigurationConstants.PREFIX_LOG_CONFIG)) {
+        String logConfigKey = key.substring(
+            ConfigurationConstants.PREFIX_GLOBAL_CONFIG.length());
         props.put(logConfigKey, config.get(key));
       }
     }
@@ -156,9 +152,14 @@ public class SqoopConfiguration {
     PropertyConfigurator.configure(props);
   }
 
-  private synchronized static void refreshConfiguration() {
+  private synchronized static void refreshConfiguration()
+  {
     config = provider.getConfiguration();
     configureLogging();
+  }
+
+  private SqoopConfiguration() {
+    // Disable explicit object creation
   }
 
   public static class CoreConfigurationListener implements ConfigurationListener

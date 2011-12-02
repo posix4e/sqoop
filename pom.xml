@@ -123,6 +123,7 @@ limitations under the License.
   <modules>
     <module>spi</module>
     <module>core</module>
+    <module>repository</module>
     <module>server</module>
     <module>client</module>
     <module>docs</module>
@@ -167,6 +168,11 @@ limitations under the License.
               </configuration>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.3.2</version>
         </plugin>
       </plugins>
     </pluginManagement>

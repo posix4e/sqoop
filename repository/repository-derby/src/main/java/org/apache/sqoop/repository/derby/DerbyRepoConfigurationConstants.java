@@ -15,29 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.core;
+package org.apache.sqoop.repository.derby;
 
-import org.junit.Assert;
-import org.junit.Test;
+public final class DerbyRepoConfigurationConstants {
 
-public class TestConfiguration {
+  public static final String PREFIX_DERBY = "derby.";
 
-  @Test
-  public void testConfigurationInitFailure() {
-    // Unset any configuration dir if it is set by another test
-    System.getProperties().remove(ConfigurationConstants.SYSPROP_CONFIG_DIR);
-    try {
-      SqoopConfiguration.initialize();
-    } catch (Exception ex) {
-      Assert.assertTrue(ex instanceof SqoopException);
-      Assert.assertSame(((SqoopException) ex).getErrorCode(),
-          CoreError.CORE_0001);
-    }
-  }
-
-  @Test
-  public void testConfigurationInitSuccess() throws Exception {
-    TestUtils.setupTestConfiguration(null);
-    SqoopConfiguration.initialize();
+  private DerbyRepoConfigurationConstants() {
+    // Disable explicit object creation
   }
 }

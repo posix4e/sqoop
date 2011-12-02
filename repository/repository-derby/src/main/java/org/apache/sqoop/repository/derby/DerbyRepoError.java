@@ -15,29 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.core;
+package org.apache.sqoop.repository.derby;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.apache.sqoop.core.ErrorCode;
 
-public class TestConfiguration {
+public enum DerbyRepoError implements ErrorCode {
 
-  @Test
-  public void testConfigurationInitFailure() {
-    // Unset any configuration dir if it is set by another test
-    System.getProperties().remove(ConfigurationConstants.SYSPROP_CONFIG_DIR);
-    try {
-      SqoopConfiguration.initialize();
-    } catch (Exception ex) {
-      Assert.assertTrue(ex instanceof SqoopException);
-      Assert.assertSame(((SqoopException) ex).getErrorCode(),
-          CoreError.CORE_0001);
-    }
+  /** An unknown error has occurred. */
+  DERBYREPO_0000("An unknown error has occurred");
+
+
+  private final String message;
+
+  private DerbyRepoError(String message) {
+    this.message = message;
   }
 
-  @Test
-  public void testConfigurationInitSuccess() throws Exception {
-    TestUtils.setupTestConfiguration(null);
-    SqoopConfiguration.initialize();
+  public String getCode() {
+    return name();
+  }
+
+  public String getMessage() {
+    return message;
   }
 }

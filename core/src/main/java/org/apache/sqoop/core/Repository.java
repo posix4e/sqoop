@@ -17,27 +17,20 @@
  */
 package org.apache.sqoop.core;
 
-import org.junit.Assert;
-import org.junit.Test;
+/**
+ * Defines the contract of a Repository used by Sqoop. A Repository allows
+ * Sqoop to store metadata, statistics and other state relevant to Sqoop
+ * Jobs in the system.
+ */
+public interface Repository {
 
-public class TestConfiguration {
 
-  @Test
-  public void testConfigurationInitFailure() {
-    // Unset any configuration dir if it is set by another test
-    System.getProperties().remove(ConfigurationConstants.SYSPROP_CONFIG_DIR);
-    try {
-      SqoopConfiguration.initialize();
-    } catch (Exception ex) {
-      Assert.assertTrue(ex instanceof SqoopException);
-      Assert.assertSame(((SqoopException) ex).getErrorCode(),
-          CoreError.CORE_0001);
-    }
-  }
+  /**
+   * Initializes the repository. If the flag <tt>createSchema</tt> is set to
+   * <tt>true</tt>, the repository implementation will create the necessary
+   * schema objects if they are missing.
+   * @param context
+   */
+  public void initialize(RepositoryContext context);
 
-  @Test
-  public void testConfigurationInitSuccess() throws Exception {
-    TestUtils.setupTestConfiguration(null);
-    SqoopConfiguration.initialize();
-  }
 }
