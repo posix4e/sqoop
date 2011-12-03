@@ -47,13 +47,7 @@ public enum CoreError implements ErrorCode {
   CORE_0006("Properties configuration provider unable to load config file"),
 
   /** The configuration system has not been initialized correctly. */
-  CORE_0007("System not initialized"),
-
-  /** The system was unable to find or load the repository provider. */
-  CORE_0008("Invalid repository provider specified"),
-
-  /** An invalid JDBC connection URL was specified. */
-  CORE_0009("Invalid JDBC connection URL specified");
+  CORE_0007("System not initialized");
 
   private final String message;
 

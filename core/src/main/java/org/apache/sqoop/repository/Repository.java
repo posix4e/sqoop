@@ -15,28 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository.derby;
+package org.apache.sqoop.repository;
 
-import javax.sql.DataSource;
+import org.apache.sqoop.core.Context;
 
-import org.apache.sqoop.repository.JdbcRepositoryContext;
-import org.apache.sqoop.repository.JdbcRepositoryHandler;
-import org.apache.sqoop.repository.Repository;
-
-public class DerbyRepository implements JdbcRepositoryHandler {
-
-  @Override
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public Repository getRepository() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+/**
+ * Defines the contract of a Repository used by Sqoop. A Repository allows
+ * Sqoop to store metadata, statistics and other state relevant to Sqoop
+ * Jobs in the system.
+ */
+public interface Repository {
 
 
 }

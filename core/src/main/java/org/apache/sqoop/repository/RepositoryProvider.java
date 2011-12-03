@@ -15,22 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.core;
+package org.apache.sqoop.repository;
 
-/**
- * Defines the contract of a Repository used by Sqoop. A Repository allows
- * Sqoop to store metadata, statistics and other state relevant to Sqoop
- * Jobs in the system.
- */
-public interface Repository {
+import org.apache.sqoop.core.Context;
 
+public interface RepositoryProvider {
 
-  /**
-   * Initializes the repository. If the flag <tt>createSchema</tt> is set to
-   * <tt>true</tt>, the repository implementation will create the necessary
-   * schema objects if they are missing.
-   * @param context
-   */
-  public void initialize(RepositoryContext context);
+  public void initialize(Context context);
+
+  public Repository getRepository();
 
 }

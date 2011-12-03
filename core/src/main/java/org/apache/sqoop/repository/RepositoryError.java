@@ -1,0 +1,67 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.sqoop.repository;
+
+import org.apache.sqoop.core.ErrorCode;
+
+public enum RepositoryError implements ErrorCode {
+
+  // General Repository Errors: Prefix REPO
+
+  /** An unknown error has occurred. */
+  REPO_0000("An unknown error has occurred"),
+
+  /** The system was unable to find or load the repository provider. */
+  REPO_0001("Invalid repository provider specified"),
+
+
+
+  // JDBC Repository Errors: Prefix JDBCREP
+
+  /** An unknown error has occurred. */
+  JDBCREPO_0000("An unknown error has occurred"),
+
+  /** The system was unable to find or load the JDBC repository handler. */
+  JDBCREPO_0001("Invalid JDBC Repository Handler specified"),
+
+  /** An invalid JDBC connection URL was specified. */
+  JDBCREPO_0002("Invalid JDBC connection URL specified"),
+
+  /** An invalid JDBC driver class name was specified. */
+  JDBCREPO_0003("Invalid JDBC driver class specified"),
+
+  /** An invalid JDBC transaction isolation level was specified. */
+  JDBCREPO_0004("Invalid JDBC transaction isolation level specified"),
+
+  /** The value specified for maximum connection pool connections is invalid.*/
+  JDBCREPO_0005("Invalid maximum connections specified for connection pool");
+
+  private final String message;
+
+  private RepositoryError(String message) {
+    this.message = message;
+  }
+
+  public String getCode() {
+    return name();
+  }
+
+  public String getMessage() {
+    return message;
+  }
+}
