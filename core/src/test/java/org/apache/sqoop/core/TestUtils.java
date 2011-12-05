@@ -22,7 +22,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -34,17 +36,7 @@ public class TestUtils {
   public static final String NEWLINE =
       System.getProperty("line.separator", "\n");
 
-  /**
-   * A helper method that creates a temporary directory, populates it with
-   * bootstrap and logging configuration and sets it up as the system config
-   * directory. This is useful for running tests without necessarily having to
-   * create an installation layout.
-   *
-   * @param config any properties that you would like to set in the system
-   * @throws Exception
-   */
-  public static void setupTestConfiguration(Properties config) throws Exception
-  {
+  public static String createEmptyConfigDirectory() throws Exception {
     File tempDir = null;
     File targetDir = new File("target");
     if (targetDir.exists() && targetDir.isDirectory()) {
@@ -65,6 +57,16 @@ public class TestUtils {
               + tempConfigDirPath);
     }
 
+    return tempConfigDirPath;
+  }
+
+  public static void setupTestConfigurationUsingProperties(
+      Properties bootstrapProps, Properties props)
+    throws Exception {
+
+    String tempConfigDirPath = createEmptyConfigDirectory();
+    File tempConfigDir = new File(tempConfigDirPath);
+
     File bootconfigFile = new File(tempConfigDir,
         ConfigurationConstants.FILENAME_BOOTCFG_FILE);
 
@@ -72,21 +74,26 @@ public class TestUtils {
       throw new Exception("Unable to create config file: " + bootconfigFile);
     }
 
-    BufferedWriter bootconfigWriter = null;
-    try {
-      bootconfigWriter = new BufferedWriter(new FileWriter(bootconfigFile));
+    if (bootstrapProps != null) {
+      BufferedWriter bootconfigWriter = null;
+      try {
+        bootconfigWriter = new BufferedWriter(new FileWriter(bootconfigFile));
 
-      bootconfigWriter.write("sqoop.config.provider = "
-            + PropertiesConfigurationProvider.class.getCanonicalName()
-            + NEWLINE);
+        Enumeration<?> bootstrapPropNames = bootstrapProps.propertyNames();
+        while (bootstrapPropNames.hasMoreElements()) {
+          String name = (String) bootstrapPropNames.nextElement();
+          String value = bootstrapProps.getProperty(name);
+          bootconfigWriter.write(name + " = " + value + NEWLINE);
+        }
 
-      bootconfigWriter.flush();
-    } finally {
-      if (bootconfigWriter != null) {
-        try {
-          bootconfigWriter.close();
-        } catch (IOException ex) {
-          LOG.error("Failed to close config file writer", ex);
+        bootconfigWriter.flush();
+      } finally {
+        if (bootconfigWriter != null) {
+          try {
+            bootconfigWriter.close();
+          } catch (IOException ex) {
+            LOG.error("Failed to close config file writer", ex);
+          }
         }
       }
     }
@@ -94,40 +101,79 @@ public class TestUtils {
     File sysconfigFile = new File(tempConfigDir,
         PropertiesConfigurationProvider.CONFIG_FILENAME);
 
-    BufferedWriter sysconfigWriter = null;
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new InputStreamReader(
-          ClassLoader.getSystemResourceAsStream("test_config.properties")));
+    if (props != null) {
+      BufferedWriter sysconfigWriter = null;
+      try {
+        sysconfigWriter = new BufferedWriter(new FileWriter(sysconfigFile));
 
-      sysconfigWriter = new BufferedWriter(new FileWriter(sysconfigFile));
-
-      String nextLine = null;
-      while ((nextLine = reader.readLine()) != null) {
-        sysconfigWriter.write(nextLine + NEWLINE);
-      }
-
-      sysconfigWriter.flush();
-    } finally {
-      if (sysconfigWriter != null) {
-        try {
-          sysconfigWriter.close();
-        } catch (IOException ex) {
-          LOG.error("Failed to close log config file writer", ex);
+        Enumeration<?> propNameEnum = props.propertyNames();
+        while (propNameEnum.hasMoreElements()) {
+          String name = (String) propNameEnum.nextElement();
+          String value = props.getProperty(name);
+          sysconfigWriter.write(name + " = " + value + NEWLINE);
+        }
+        sysconfigWriter.flush();
+      } finally {
+        if (sysconfigWriter != null) {
+          try {
+            sysconfigWriter.close();
+          } catch (IOException ex) {
+            LOG.error("Failed to close log config file writer", ex);
+          }
         }
       }
+    }
+    System.setProperty(ConfigurationConstants.SYSPROP_CONFIG_DIR,
+        tempConfigDirPath);
+  }
 
-      if (reader != null) {
+  /**
+   * Sets up the test configuration using any properties specified in the
+   * test file test_config.properties. If the parameter <tt>extraConfig</tt>
+   * is specified, it is added to these properties. Consequently any property
+   * that exists in both the test_config.properties and the supplied extra
+   * properties will retain the value from the later.
+   *
+   * @param extraConfig any properties that you would like to set in the system
+   * @throws Exception
+   */
+  public static void setupTestConfigurationWithExtraConfig(
+      Properties extraBootstrapConfig, Properties extraConfig) throws Exception
+  {
+
+    Properties props = new Properties();
+
+    InputStream istream = null;
+    try {
+      istream = ClassLoader.getSystemResourceAsStream("test_config.properties");
+      props.load(istream);
+    } finally {
+      if (istream != null) {
         try {
-          reader.close();
-        } catch (IOException ex) {
-          LOG.error("Failed to close log config reader", ex);
+          istream.close();
+        } catch (Exception ex) {
+          LOG.warn("Failed to close input stream", ex);
         }
       }
     }
 
-    System.setProperty(ConfigurationConstants.SYSPROP_CONFIG_DIR,
-        tempConfigDirPath);
+    if (props.size() == 0) {
+      throw new Exception("Unable to load test_config.properties");
+    }
+
+    if (extraConfig != null && extraConfig.size() > 0) {
+      props.putAll(extraConfig);
+    }
+
+    Properties bootstrapProps = new Properties();
+    bootstrapProps.setProperty("sqoop.config.provider",
+        PropertiesConfigurationProvider.class.getCanonicalName());
+
+    if (extraBootstrapConfig != null && extraBootstrapConfig.size() > 0) {
+      bootstrapProps.putAll(extraBootstrapConfig);
+    }
+
+    setupTestConfigurationUsingProperties(bootstrapProps, props);
   }
 
 

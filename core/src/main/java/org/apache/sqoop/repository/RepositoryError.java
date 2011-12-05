@@ -29,8 +29,6 @@ public enum RepositoryError implements ErrorCode {
   /** The system was unable to find or load the repository provider. */
   REPO_0001("Invalid repository provider specified"),
 
-
-
   // JDBC Repository Errors: Prefix JDBCREP
 
   /** An unknown error has occurred. */
@@ -49,7 +47,22 @@ public enum RepositoryError implements ErrorCode {
   JDBCREPO_0004("Invalid JDBC transaction isolation level specified"),
 
   /** The value specified for maximum connection pool connections is invalid.*/
-  JDBCREPO_0005("Invalid maximum connections specified for connection pool");
+  JDBCREPO_0005("Invalid maximum connections specified for connection pool"),
+
+  /** The system attempted to use an incactive transaction. */
+  JDBCREPO_0006("Transaction is not active"),
+
+  /**
+   * The system was unable to obtain a connection lease for the
+   * requested transaction.
+   */
+  JDBCREPO_0007("Unable to lease connection"),
+
+  /** The system attempted to commit a transaction marked for rollback.*/
+  JDBCREPO_0008("Attempt to commit a transaction marked for rollback"),
+
+  /** The system was unable to finalize the transaction. */
+  JDBCREPO_0009("Failed to finalize transaction");
 
   private final String message;
 

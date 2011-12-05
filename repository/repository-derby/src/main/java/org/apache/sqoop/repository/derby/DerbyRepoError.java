@@ -22,7 +22,10 @@ import org.apache.sqoop.core.ErrorCode;
 public enum DerbyRepoError implements ErrorCode {
 
   /** An unknown error has occurred. */
-  DERBYREPO_0000("An unknown error has occurred");
+  DERBYREPO_0000("An unknown error has occurred"),
+
+  /** The Derby Repository handler was unable to determine if schema exists.*/
+  DERBYREPO_0001("Unable to determine if schema exists");
 
 
   private final String message;

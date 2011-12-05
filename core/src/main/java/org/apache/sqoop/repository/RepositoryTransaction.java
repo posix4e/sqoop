@@ -17,13 +17,17 @@
  */
 package org.apache.sqoop.repository;
 
-
 /**
- * Defines the contract of a Repository used by Sqoop. A Repository allows
- * Sqoop to store metadata, statistics and other state relevant to Sqoop
- * Jobs in the system.
+ * A transaction that can be used to group multiple repository operations into
+ * a single transaction.
  */
-public interface Repository {
+public interface RepositoryTransaction {
 
-  public RepositoryTransaction getTransaction();
+  public void begin();
+
+  public void commit();
+
+  public void rollback();
+
+  public void close();
 }

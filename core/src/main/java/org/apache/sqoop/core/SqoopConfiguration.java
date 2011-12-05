@@ -139,6 +139,13 @@ public final class SqoopConfiguration {
     return new Context(parameters);
   }
 
+  public synchronized static void destroy() {
+    initialized = false;
+    configDir = null;
+    provider = null;
+    config = null;
+  }
+
   private synchronized static void configureLogging() {
     Properties props = new Properties();
     for (String key : config.keySet()) {

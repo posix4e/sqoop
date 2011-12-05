@@ -42,10 +42,11 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
 
   private JdbcRepositoryContext repoContext;
 
-  private JdbcRepositoryHandler handler;
   private GenericObjectPool connectionPool;
   private KeyedObjectPoolFactory statementPool;
   private DataSource dataSource;
+
+  private JdbcRepositoryHandler handler;
 
   public JdbcRepositoryProvider() {
     // Default constructor
@@ -55,6 +56,12 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
   public synchronized void initialize(Context context) {
     repoContext = new JdbcRepositoryContext(SqoopConfiguration.getContext());
 
+    initializeRepositoryHandler();
+
+    LOG.info("JdbcRepository initialized.");
+  }
+
+  private void initializeRepositoryHandler() {
     String jdbcHandlerClassName = repoContext.getHandlerClassName();
 
     Class<?> handlerClass = ClassLoadingUtils.loadClass(jdbcHandlerClassName);
@@ -107,7 +114,7 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
 
     handler.initialize(dataSource, repoContext);
 
-    LOG.info("JdbcRepository initialized.");
+
   }
 
   @Override

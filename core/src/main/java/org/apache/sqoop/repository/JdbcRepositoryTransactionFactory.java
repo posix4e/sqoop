@@ -17,13 +17,20 @@
  */
 package org.apache.sqoop.repository;
 
+import javax.sql.DataSource;
 
-/**
- * Defines the contract of a Repository used by Sqoop. A Repository allows
- * Sqoop to store metadata, statistics and other state relevant to Sqoop
- * Jobs in the system.
- */
-public interface Repository {
+public class JdbcRepositoryTransactionFactory extends
+      ThreadLocal<JdbcRepositoryTransaction> {
 
-  public RepositoryTransaction getTransaction();
+  private final DataSource dataSource;
+
+  protected JdbcRepositoryTransactionFactory(DataSource dataSource) {
+    super();
+    this.dataSource = dataSource;
+  }
+
+  @Override
+  protected JdbcRepositoryTransaction initialValue() {
+    return new JdbcRepositoryTransaction(dataSource, this);
+  }
 }

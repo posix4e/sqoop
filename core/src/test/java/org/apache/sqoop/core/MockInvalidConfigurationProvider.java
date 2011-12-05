@@ -15,28 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository.derby;
+package org.apache.sqoop.core;
 
-import javax.sql.DataSource;
+import java.io.File;
+import java.util.Map;
+import java.util.Properties;
 
-import org.apache.sqoop.repository.JdbcRepositoryContext;
-import org.apache.sqoop.repository.JdbcRepositoryHandler;
-import org.apache.sqoop.repository.Repository;
+public class MockInvalidConfigurationProvider implements ConfigurationProvider {
 
-public class DerbyRepository implements JdbcRepositoryHandler {
+  public MockInvalidConfigurationProvider() {
+    throw new RuntimeException("Cannot instantiate");
+  }
 
   @Override
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext) {
+  public void initialize(File configDir, Properties bootstrapCongiruation) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public Repository getRepository() {
+  public void registerListener(ConfigurationListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public Map<String, String> getConfiguration() {
     // TODO Auto-generated method stub
     return null;
   }
-
 
 }
