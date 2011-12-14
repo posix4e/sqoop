@@ -17,10 +17,14 @@
  */
 package org.apache.sqoop.server;
 
-import org.apache.sqoop.core.SqoopConfiguration;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
+import org.apache.log4j.Logger;
+import org.apache.sqoop.connector.ConnectorManager;
+import org.apache.sqoop.core.SqoopConfiguration;
+import org.apache.sqoop.core.SqoopException;
+import org.apache.sqoop.repository.RepositoryManager;
 
 
 /**
@@ -29,13 +33,23 @@ import javax.servlet.ServletContextListener;
  */
 public class ServerInitializer implements ServletContextListener {
 
-  public void contextDestroyed(ServletContextEvent arg0) {
-    // TODO Auto-generated method stub
+  private static final Logger LOG =
+      Logger.getLogger(ServerInitializer.class);
 
+  public void contextDestroyed(ServletContextEvent arg0) {
+    ConnectorManager.destroy();
+    RepositoryManager.destroy();
+    SqoopConfiguration.destroy();
   }
 
   public void contextInitialized(ServletContextEvent arg0) {
-    SqoopConfiguration.initialize();
-
+    try {
+      SqoopConfiguration.initialize();
+      RepositoryManager.initialize();
+      ConnectorManager.initialize();
+    } catch (RuntimeException ex) {
+      LOG.error("Server startup failure", ex);
+      throw ex;
+    }
   }
 }

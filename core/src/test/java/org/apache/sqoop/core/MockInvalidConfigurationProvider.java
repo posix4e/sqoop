@@ -45,4 +45,10 @@ public class MockInvalidConfigurationProvider implements ConfigurationProvider {
     return null;
   }
 
+  @Override
+  public void destroy() {
+    // TODO Auto-generated method stub
+
+  }
+
 }

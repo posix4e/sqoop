@@ -62,7 +62,10 @@ public enum RepositoryError implements ErrorCode {
   JDBCREPO_0008("Attempt to commit a transaction marked for rollback"),
 
   /** The system was unable to finalize the transaction. */
-  JDBCREPO_0009("Failed to finalize transaction");
+  JDBCREPO_0009("Failed to finalize transaction"),
+
+  /** The system was not able to dergeister the driver during shutdown. */
+  JDBCREPO_0010("Unable to deregister driver during shutdown");
 
   private final String message;
 

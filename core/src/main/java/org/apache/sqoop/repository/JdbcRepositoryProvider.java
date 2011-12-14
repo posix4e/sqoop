@@ -17,6 +17,9 @@
  */
 package org.apache.sqoop.repository;
 
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -47,6 +50,8 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
   private DataSource dataSource;
 
   private JdbcRepositoryHandler handler;
+  private Driver driver;
+
 
   public JdbcRepositoryProvider() {
     // Default constructor
@@ -59,6 +64,29 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
     initializeRepositoryHandler();
 
     LOG.info("JdbcRepository initialized.");
+  }
+
+  @Override
+  public synchronized void destroy() {
+    try {
+      connectionPool.close();
+    } catch (Exception ex) {
+      LOG.error("Failed to shutdown connection pool", ex);
+    }
+
+    handler.shutdown();
+
+    if (driver != null) {
+      try {
+        DriverManager.deregisterDriver(driver);
+      } catch (SQLException ex) {
+        LOG.error("Failed to deregister driver", ex);
+      }
+    }
+    handler = null;
+    driver = null;
+    dataSource = null;
+
   }
 
   private void initializeRepositoryHandler() {
@@ -90,7 +118,9 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
     }
 
     // Initialize a datasource
-    if (ClassLoadingUtils.loadClass(jdbcDriverClassName) == null) {
+    Class<?> driverClass = ClassLoadingUtils.loadClass(jdbcDriverClassName);
+
+    if (driverClass == null) {
       throw new SqoopException(RepositoryError.JDBCREPO_0003,
           jdbcDriverClassName);
     }

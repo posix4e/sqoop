@@ -52,6 +52,13 @@ public final class ConfigurationConstants {
       "sqoop_bootstrap.properties";
 
 
+  public static final String FILENAME_CONNECTOR_PROPERTIES =
+      "sqoopconnector.properties";
+
+  public static final String CONPROP_PROVIDER_CLASS =
+      "org.apache.sqoop.connector";
+
+
   private ConfigurationConstants() {
     // Disable explicit object creation
   }

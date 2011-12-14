@@ -45,6 +45,9 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
 
   private File configFile;
 
+  private ConfigFilePoller poller;
+  private Thread pollerThread;
+
   public PropertiesConfigurationProvider() {
     // Default constructor
   }
@@ -62,6 +65,23 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
     return config;
   }
 
+  @Override
+  public synchronized void destroy() {
+    LOG.info("Shutting down configuration poller thread");
+    if (poller != null) {
+      poller.setShutdown();
+    }
+    if (pollerThread != null) {
+      pollerThread.interrupt();
+      try {
+        pollerThread.join();
+      } catch (InterruptedException ex) {
+        // No handling requried - best effort only
+      }
+    }
+    poller = null;
+    pollerThread = null;
+  }
 
   @Override
   public synchronized void initialize(
@@ -72,9 +92,9 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
     }
 
     loadConfiguration(false); // at least one load must succeed
-
-    Thread pollerThread = new Thread(new ConfigFilePoller(configFile));
-    pollerThread.setName("config-file-poller");
+    poller = new ConfigFilePoller(configFile);
+    pollerThread = new Thread(poller);
+    pollerThread.setName("sqoop-config-file-poller");
     pollerThread.setDaemon(true);
 
     LOG.info("Starting config file poller thread");
@@ -113,14 +133,24 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
     }
   }
 
-  class ConfigFilePoller implements Runnable {
+  private class ConfigFilePoller implements Runnable {
     private File file;
 
     private long lastUpdatedAt;
 
+    private boolean shutdown;
+
     ConfigFilePoller(File configFile) {
       this.file = configFile;
       lastUpdatedAt = configFile.lastModified();
+    }
+
+    synchronized void setShutdown() {
+      shutdown = true;
+    }
+
+    private synchronized boolean isShutdown() {
+      return shutdown;
     }
 
     @Override
@@ -142,6 +172,10 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
           Thread.sleep(30);
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
+        }
+
+        if (isShutdown()) {
+          break;
         }
       }
     }

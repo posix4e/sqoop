@@ -15,25 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository.derby;
+package org.apache.sqoop.connector;
 
 import org.apache.sqoop.core.ErrorCode;
 
-public enum DerbyRepoError implements ErrorCode {
+public enum ConnectorError implements ErrorCode {
 
   /** An unknown error has occurred. */
-  DERBYREPO_0000("An unknown error has occurred"),
+  CONN_0000("An unknown error has occurred"),
 
-  /** The Derby Repository handler was unable to determine if schema exists.*/
-  DERBYREPO_0001("Unable to determine if schema exists"),
+  /** The system was not able to initialize the configured connectors. */
+  CONN_0001("Unable to initialize connectors"),
 
-  /** The system was unable to shutdown embedded derby repository server. */
-  DERBYREPO_0002("Unable to shutdown embedded  Derby instance");
+  /** No connectors were found in the system. */
+  CONN_0002("No connectors were found in the system"),
 
+  /** A problem was encountered while loading the connector configuration. */
+  CONN_0003("Failed to load connector configuration"),
+
+  /** A connector configuration file did not include the provider class name.*/
+  CONN_0004("Connector configuration did not include provider class name"),
+
+  /** An exception occurred while attempting to instantiate the connector. */
+  CONN_0005("Failed to instantiate connector class");
 
   private final String message;
 
-  private DerbyRepoError(String message) {
+  private ConnectorError(String message) {
     this.message = message;
   }
 

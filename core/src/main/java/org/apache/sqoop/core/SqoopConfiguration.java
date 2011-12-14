@@ -140,10 +140,17 @@ public final class SqoopConfiguration {
   }
 
   public synchronized static void destroy() {
-    initialized = false;
-    configDir = null;
+    if (provider != null) {
+      try {
+        provider.destroy();
+      } catch (Exception ex) {
+        LOG.error("Failed to shutdown configuration provider", ex);
+      }
+    }
     provider = null;
+    configDir = null;
     config = null;
+    initialized = false;
   }
 
   private synchronized static void configureLogging() {

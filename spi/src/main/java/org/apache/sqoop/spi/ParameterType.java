@@ -15,33 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository.derby;
+package org.apache.sqoop.spi;
 
-import org.apache.sqoop.core.ErrorCode;
+public enum ParameterType {
 
-public enum DerbyRepoError implements ErrorCode {
+  BOOLEAN,
 
-  /** An unknown error has occurred. */
-  DERBYREPO_0000("An unknown error has occurred"),
+  STRING,
 
-  /** The Derby Repository handler was unable to determine if schema exists.*/
-  DERBYREPO_0001("Unable to determine if schema exists"),
+  SINGLE_CHOICE,
 
-  /** The system was unable to shutdown embedded derby repository server. */
-  DERBYREPO_0002("Unable to shutdown embedded  Derby instance");
-
-
-  private final String message;
-
-  private DerbyRepoError(String message) {
-    this.message = message;
-  }
-
-  public String getCode() {
-    return name();
-  }
-
-  public String getMessage() {
-    return message;
-  }
+  MULTIPLE_CHOICE;
 }

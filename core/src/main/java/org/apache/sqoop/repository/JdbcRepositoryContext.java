@@ -95,6 +95,10 @@ public final class JdbcRepositoryContext {
     String txIsolation = context.getString(
         RepoConfigurationConstants.SYSCFG_REPO_JDBC_TX_ISOLATION);
 
+    if (txIsolation == null || txIsolation.trim().length() == 0) {
+      throw new SqoopException(RepositoryError.JDBCREPO_0004);
+    }
+
     try {
       transactionIsolation = JdbcTransactionIsolation.getByName(txIsolation);
     } catch (IllegalArgumentException ex) {

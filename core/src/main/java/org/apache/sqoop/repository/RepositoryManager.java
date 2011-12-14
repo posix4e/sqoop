@@ -67,7 +67,15 @@ public final class RepositoryManager {
     LOG.info("Repository initialized: OK");
   }
 
-  public synchronized Repository getRepository() {
+  public static synchronized void destroy() {
+    try {
+      provider.destroy();
+    } catch (Exception ex) {
+      LOG.error("Failed to shutdown repository provider", ex);
+    }
+  }
+
+  public static synchronized Repository getRepository() {
     return provider.getRepository();
   }
 }

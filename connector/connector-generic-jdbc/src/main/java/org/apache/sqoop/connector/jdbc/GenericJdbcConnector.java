@@ -15,33 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository.derby;
+package org.apache.sqoop.connector.jdbc;
 
-import org.apache.sqoop.core.ErrorCode;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-public enum DerbyRepoError implements ErrorCode {
+import org.apache.sqoop.spi.SqoopConnector;
 
-  /** An unknown error has occurred. */
-  DERBYREPO_0000("An unknown error has occurred"),
+public class GenericJdbcConnector implements SqoopConnector {
 
-  /** The Derby Repository handler was unable to determine if schema exists.*/
-  DERBYREPO_0001("Unable to determine if schema exists"),
-
-  /** The system was unable to shutdown embedded derby repository server. */
-  DERBYREPO_0002("Unable to shutdown embedded  Derby instance");
-
-
-  private final String message;
-
-  private DerbyRepoError(String message) {
-    this.message = message;
+  @Override
+  public ResourceBundle getBundle(Locale locale) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
-  public String getCode() {
-    return name();
-  }
-
-  public String getMessage() {
-    return message;
-  }
 }

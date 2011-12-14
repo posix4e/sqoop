@@ -18,6 +18,7 @@
 package org.apache.sqoop.repository.derby;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,6 +42,10 @@ public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
       "SELECT SCHEMAID FROM SYS.SYSSCHEMAS WHERE SCHEMANAME = '"
           + SCHEMA_SQOOP + "'";
 
+  private static final String EMBEDDED_DERBY_DRIVER_CLASSNAME =
+          "org.apache.derby.jdbc.EmbeddedDriver";
+
+
   private JdbcRepositoryContext repoContext;
   private DataSource dataSource;
 
@@ -51,6 +56,7 @@ public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
       LOG.trace("DerbyRepositoryHandler begin initialization");
     }
 
+    this.dataSource = dataSource;
     repoContext = ctx;
 
     if (repoContext.shouldCreateSchema()) {
@@ -66,6 +72,45 @@ public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
   public synchronized Repository getRepository() {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public synchronized void shutdown() {
+    String driver = repoContext.getDriverClass();
+    if (driver != null && driver.equals(EMBEDDED_DERBY_DRIVER_CLASSNAME)) {
+      // Using embedded derby. Needs explicit shutdown
+      String connectUrl = repoContext.getConnectionUrl();
+      if (connectUrl.startsWith("jdbc:derby:")) {
+        int index = connectUrl.indexOf(";");
+        String baseUrl = null;
+        if (index != -1) {
+          baseUrl = connectUrl.substring(0, index+1);
+        } else {
+          baseUrl = connectUrl + ";";
+        }
+        String shutDownUrl = baseUrl + "shutdown=true";
+
+        LOG.debug("Attempting to shutdown embedded Derby using URL: "
+            + shutDownUrl);
+
+        try {
+          DriverManager.getConnection(shutDownUrl);
+        } catch (SQLException ex) {
+          // Shutdown for one db instance is expected to raise SQL STATE 45000
+          if (ex.getErrorCode() != 45000) {
+            throw new SqoopException(
+                DerbyRepoError.DERBYREPO_0002, shutDownUrl, ex);
+          }
+          LOG.info("Embedded Derby shutdown raised SQL STATE "
+              + "45000 as expected.");
+        }
+      } else {
+        LOG.warn("Even though embedded Derby drvier was loaded, the connect "
+            + "URL is of an unexpected form: " + connectUrl + ". Therfore no "
+            + "attempt will be made to shutdown embedded Derby instance.");
+      }
+
+    }
   }
 
 
@@ -91,10 +136,12 @@ public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
 
       connection.commit();
     } catch (SQLException ex) {
-      try {
-        connection.rollback();
-      } catch (SQLException ex2) {
-        LOG.error("Unable to rollback transaction", ex2);
+      if (connection != null) {
+        try {
+          connection.rollback();
+        } catch (SQLException ex2) {
+          LOG.error("Unable to rollback transaction", ex2);
+        }
       }
       throw new SqoopException(DerbyRepoError.DERBYREPO_0001, ex);
     } finally {

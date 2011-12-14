@@ -15,41 +15,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.spi;
 
-import java.sql.Connection;
+import java.util.Locale;
 
-public enum JdbcTransactionIsolation {
+public class Parameter {
 
-  READ_UNCOMMITTED("READ_UNCOMMITTED", Connection.TRANSACTION_READ_UNCOMMITTED),
-  READ_COMMITTED("READ_COMMITTED", Connection.TRANSACTION_READ_COMMITTED),
-  REPEATABLE_READ("REPEATABLE_READ", Connection.TRANSACTION_REPEATABLE_READ),
-  SERIALIZABLE("SERIALIZABLE", Connection.TRANSACTION_SERIALIZABLE);
-
+  private final ParameterType type;
   private final String name;
-  private final int code;
+  private final String label;
 
-  private JdbcTransactionIsolation(String name, int code) {
+  private String value;
+  private boolean error;
+  private String errorMessage;
+
+  public Parameter(ParameterType type, String name, String label) {
+    this.type = type;
     this.name = name;
-    this.code = code;
-  }
-
-  public int getCode() {
-    return code;
+    this.label = label;
   }
 
   public String getName() {
     return name;
   }
 
-  public String toString() {
-    return getName();
+  public ParameterType getType() {
+    return type;
   }
 
-  public static JdbcTransactionIsolation getByName(String name) {
-    if (name == null || name.trim().length() == 0) {
-      return null;
-    }
-    return valueOf(name.trim().toUpperCase());
+  public String getLabel() {
+    return label;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public boolean isError() {
+    return error;
+  }
+
+  public void setError(String errorMessage) {
+    this.errorMessage = errorMessage;
+  }
+
+  public String getErrorMessage(Locale locale) {
+    return errorMessage;
   }
 }

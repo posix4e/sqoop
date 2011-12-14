@@ -24,6 +24,8 @@ public interface JdbcRepositoryHandler {
   public void initialize(DataSource dataSource,
       JdbcRepositoryContext repoContext);
 
+  public void shutdown();
+
   public Repository getRepository();
 
 }

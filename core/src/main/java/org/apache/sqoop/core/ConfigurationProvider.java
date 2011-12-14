@@ -25,6 +25,8 @@ public interface ConfigurationProvider {
 
   public void initialize(File configDir, Properties bootstrapCongiruation);
 
+  public void destroy();
+
   public void registerListener(ConfigurationListener listener);
 
   public Map<String, String> getConfiguration();

@@ -23,6 +23,8 @@ public interface RepositoryProvider {
 
   public void initialize(Context context);
 
+  public void destroy();
+
   public Repository getRepository();
 
 }
