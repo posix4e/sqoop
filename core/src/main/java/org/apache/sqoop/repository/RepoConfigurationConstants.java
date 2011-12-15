@@ -29,6 +29,13 @@ public final class RepoConfigurationConstants {
       ConfigurationConstants.PREFIX_GLOBAL_CONFIG + "repository.";
 
   /**
+   * System properties set up by the Repository Manager before initializing
+   * the provider.
+   */
+  public static final String SYSCFG_REPO_SYSPROP_PREFIX = PREFIX_REPO_CONFIG
+      + "sysprop.";
+
+  /**
    * Class name of the repository implementation specified by:
    * <tt>org.apache.sqoop.repository.provider</tt>
    */

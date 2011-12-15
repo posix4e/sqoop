@@ -15,16 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.common;
 
-import javax.sql.DataSource;
+import org.json.simple.JSONObject;
 
-public interface JdbcRepositoryHandler {
+public interface JsonBean {
 
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext);
+  public JSONObject extract();
 
-  public void shutdown();
+  public void restore(JSONObject jsonObject);
 
-  public Repository getRepository();
+  public static final JsonBean EMPTY_BEAN = new JsonBean() {
+
+    @Override
+    public JSONObject extract() {
+      return new JSONObject();
+    }
+
+    @Override
+    public void restore(JSONObject jsonObject) {
+    }
+  };
 }

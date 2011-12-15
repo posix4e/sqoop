@@ -15,16 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.server;
 
-import javax.sql.DataSource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-public interface JdbcRepositoryHandler {
+public class RequestContext {
 
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext);
+  private final HttpServletRequest request;
+  private final HttpServletResponse response;
 
-  public void shutdown();
+  public RequestContext(HttpServletRequest req, HttpServletResponse resp) {
+    request = req;
+    response = resp;
+  }
 
-  public Repository getRepository();
+  public HttpServletRequest getRequest() {
+    return request;
+  }
+
+  public HttpServletResponse getResponse() {
+    return response;
+  }
+
+  public String getPath() {
+    return request.getRequestURL().toString();
+  }
 }

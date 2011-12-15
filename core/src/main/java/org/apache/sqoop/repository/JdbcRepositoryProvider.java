@@ -78,6 +78,7 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
 
     if (driver != null) {
       try {
+        LOG.info("Deregistering JDBC driver");
         DriverManager.deregisterDriver(driver);
       } catch (SQLException ex) {
         LOG.error("Failed to deregister driver", ex);
@@ -86,7 +87,6 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
     handler = null;
     driver = null;
     dataSource = null;
-
   }
 
   private void initializeRepositoryHandler() {
@@ -125,6 +125,13 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
           jdbcDriverClassName);
     }
 
+    try {
+      driver = (Driver) driverClass.newInstance();
+    } catch (Exception ex) {
+      throw new SqoopException(RepositoryError.JDBCREPO_0003,
+          jdbcDriverClassName, ex);
+    }
+
     Properties jdbcProps = repoContext.getConnectionProperties();
 
     ConnectionFactory connFactory =
@@ -143,8 +150,6 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
     dataSource = new PoolingDataSource(connectionPool);
 
     handler.initialize(dataSource, repoContext);
-
-
   }
 
   @Override

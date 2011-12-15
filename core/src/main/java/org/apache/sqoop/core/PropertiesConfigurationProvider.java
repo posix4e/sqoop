@@ -46,7 +46,6 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
   private File configFile;
 
   private ConfigFilePoller poller;
-  private Thread pollerThread;
 
   public PropertiesConfigurationProvider() {
     // Default constructor
@@ -70,17 +69,14 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
     LOG.info("Shutting down configuration poller thread");
     if (poller != null) {
       poller.setShutdown();
-    }
-    if (pollerThread != null) {
-      pollerThread.interrupt();
+      poller.interrupt();
       try {
-        pollerThread.join();
+        poller.join();
       } catch (InterruptedException ex) {
-        // No handling requried - best effort only
+        Thread.currentThread().interrupt();
       }
     }
     poller = null;
-    pollerThread = null;
   }
 
   @Override
@@ -93,12 +89,8 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
 
     loadConfiguration(false); // at least one load must succeed
     poller = new ConfigFilePoller(configFile);
-    pollerThread = new Thread(poller);
-    pollerThread.setName("sqoop-config-file-poller");
-    pollerThread.setDaemon(true);
-
     LOG.info("Starting config file poller thread");
-    pollerThread.start();
+    poller.start();
   }
 
   private synchronized void loadConfiguration(boolean notifyListeners) {
@@ -133,7 +125,7 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
     }
   }
 
-  private class ConfigFilePoller implements Runnable {
+  private class ConfigFilePoller extends Thread {
     private File file;
 
     private long lastUpdatedAt;
@@ -143,6 +135,8 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
     ConfigFilePoller(File configFile) {
       this.file = configFile;
       lastUpdatedAt = configFile.lastModified();
+      this.setName("sqoop-config-file-poller");
+      this.setDaemon(true);
     }
 
     synchronized void setShutdown() {
@@ -162,6 +156,7 @@ public class PropertiesConfigurationProvider implements ConfigurationProvider {
         if (file.lastModified() > lastUpdatedAt) {
           LOG.info("Configuration file change detected, attempting to load");
           try {
+            lastUpdatedAt = file.lastModified();
             loadConfiguration(true);
           } catch (Exception ex) {
             LOG.error("Exception while loading configuration", ex);

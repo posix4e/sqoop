@@ -15,16 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.server;
 
-import javax.sql.DataSource;
 
-public interface JdbcRepositoryHandler {
+import org.apache.sqoop.common.JsonBean;
+import org.apache.sqoop.core.SqoopException;
 
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext);
+public interface RequestHandler {
 
-  public void shutdown();
-
-  public Repository getRepository();
+  public JsonBean handleEvent(RequestContext ctx) throws SqoopException;
 }

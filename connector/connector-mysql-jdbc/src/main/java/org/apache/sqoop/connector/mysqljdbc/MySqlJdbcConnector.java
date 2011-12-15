@@ -15,16 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.connector.mysqljdbc;
 
-import javax.sql.DataSource;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-public interface JdbcRepositoryHandler {
+import org.apache.sqoop.spi.SqoopConnector;
 
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext);
+public class MySqlJdbcConnector implements SqoopConnector {
 
-  public void shutdown();
+  @Override
+  public ResourceBundle getBundle(Locale locale) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-  public Repository getRepository();
 }

@@ -15,16 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.common;
 
-import javax.sql.DataSource;
+public enum SqoopResponseCode {
 
-public interface JdbcRepositoryHandler {
+  SQOOP_1000("1000", "OK"),
+  SQOOP_2000("2000", "ERROR");
 
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext);
+  private final String code;
+  private final String message;
 
-  public void shutdown();
+  private SqoopResponseCode(String code, String message) {
+    this.code = code;
+    this.message = message;
+  }
 
-  public Repository getRepository();
+  public String getCode() {
+    return code;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public static SqoopResponseCode getFromCode(String code) {
+    return SqoopResponseCode.valueOf("SQOOP_" + code);
+  }
+
 }

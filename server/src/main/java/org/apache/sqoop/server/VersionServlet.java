@@ -15,16 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.server;
 
-import javax.sql.DataSource;
+import org.apache.sqoop.common.JsonBean;
+import org.apache.sqoop.handler.VersionRequestHandler;
 
-public interface JdbcRepositoryHandler {
+/**
+ * Exposes the supported versions available in the server.
+ *
+ */
+@SuppressWarnings("serial")
+public class VersionServlet extends SqoopProtocolServlet {
 
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext);
+  private RequestHandler versionRequestHandler;
 
-  public void shutdown();
+  public VersionServlet() {
+    versionRequestHandler = new VersionRequestHandler();
+  }
 
-  public Repository getRepository();
+  @Override
+  protected JsonBean handleGetRequest(RequestContext ctx) throws Exception {
+    return versionRequestHandler.handleEvent(ctx);
+  }
 }

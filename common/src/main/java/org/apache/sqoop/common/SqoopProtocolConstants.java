@@ -15,16 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.common;
 
-import javax.sql.DataSource;
+public class SqoopProtocolConstants {
 
-public interface JdbcRepositoryHandler {
+  public static final String HEADER_SQOOP_ERROR_CODE = "sqoop-error-code";
 
-  public void initialize(DataSource dataSource,
-      JdbcRepositoryContext repoContext);
+  public static final String HEADER_SQOOP_ERROR_MESSAGE = "sqoop-error-message";
 
-  public void shutdown();
+  public static final String HEADER_SQOOP_INTERNAL_ERROR_CODE =
+      "sqoop-internal-error-code";
 
-  public Repository getRepository();
+  public static final String HEADER_SQOOP_INTERNAL_ERROR_MESSAGE =
+      "sqoop-internal-error-message";
+
+  public static final String JSON_CONTENT_TYPE =
+      "application/json; charset=\"UTF-8\"";
+
+  private SqoopProtocolConstants() {
+    // Disable explicit object creation
+  }
 }
