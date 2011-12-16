@@ -32,10 +32,13 @@ public final class ConnectorHandler {
 
   private final Properties properties = new Properties();
 
+  private final String connectorUrl;
   private final String connectorClassName;
+  private final String connectorShortName;
   private final SqoopConnector connector;
 
   public ConnectorHandler(URL configFileUrl) {
+    connectorUrl = configFileUrl.toString();
     try {
       properties.load(configFileUrl.openStream());
     } catch (IOException ex) {
@@ -59,6 +62,8 @@ public final class ConnectorHandler {
               connectorClassName, ex);
     }
 
+    connectorShortName = connectorClass.getSimpleName();
+
     try {
       connector = (SqoopConnector) connectorClass.newInstance();
     } catch (IllegalAccessException ex) {
@@ -72,5 +77,22 @@ public final class ConnectorHandler {
     if (LOG.isInfoEnabled()) {
       LOG.info("Connector [" + connectorClassName + "] initialized.");
     }
+  }
+
+  public String toString() {
+    return "{" + connectorShortName + ":" + connectorClassName
+        + ":" + connectorUrl + "}";
+  }
+
+  public String getShortName() {
+    return connectorShortName;
+  }
+
+  public String getCanonicalName() {
+    return connectorClassName;
+  }
+
+  public String getConnectorUrl() {
+    return connectorUrl;
   }
 }

@@ -65,7 +65,24 @@ public enum RepositoryError implements ErrorCode {
   JDBCREPO_0009("Failed to finalize transaction"),
 
   /** The system was not able to dergeister the driver during shutdown. */
-  JDBCREPO_0010("Unable to deregister driver during shutdown");
+  JDBCREPO_0010("Unable to deregister driver during shutdown"),
+
+  /**
+   * An attempt was made to reinitialize already
+   * initialized JDBC repository context.
+   */
+  JDBCREPO_0011("Attempt to reinitialize JDBC repository context"),
+
+  /** The system was unable to register the connector in its repository. */
+  JDBCREPO_0012("Failed to register connector in repository"),
+
+  /**
+   * More than one connectors installed in the system have the same
+   * short name.
+   */
+  JDBCREPO_0013("Could not register connectors due to conflicting names");
+
+
 
   private final String message;
 

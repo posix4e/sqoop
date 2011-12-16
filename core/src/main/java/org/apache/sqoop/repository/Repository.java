@@ -26,4 +26,7 @@ package org.apache.sqoop.repository;
 public interface Repository {
 
   public RepositoryTransaction getTransaction();
+
+  public void registerConnector(
+      String connectorShortName, String connectorCanonicalName);
 }

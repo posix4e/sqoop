@@ -35,15 +35,19 @@ public class JdbcRepositoryTransaction implements RepositoryTransaction {
   private final DataSource dataSource;
   private Connection connection;
   private JdbcRepositoryTransactionFactory txFactory;
-  boolean active = true;
-  int count = 0;
+  private boolean active = true;
+  private int count = 0;
 
-  boolean rollback = false;
+  private boolean rollback = false;
 
   protected JdbcRepositoryTransaction(DataSource dataSource,
       JdbcRepositoryTransactionFactory factory) {
     this.dataSource = dataSource;
     txFactory = factory;
+  }
+
+  public Connection getConnection() {
+    return connection;
   }
 
   @Override

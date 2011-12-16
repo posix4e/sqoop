@@ -28,7 +28,10 @@ public enum DerbyRepoError implements ErrorCode {
   DERBYREPO_0001("Unable to determine if schema exists"),
 
   /** The system was unable to shutdown embedded derby repository server. */
-  DERBYREPO_0002("Unable to shutdown embedded  Derby instance");
+  DERBYREPO_0002("Unable to shutdown embedded  Derby instance"),
+
+  /** The system was unable to run the specified query. */
+  DERBYREPO_0003("Unable to run specified query");
 
 
   private final String message;

@@ -21,18 +21,23 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.sqoop.core.ConfigurationConstants;
 import org.apache.sqoop.core.SqoopException;
+import org.apache.sqoop.repository.Repository;
+import org.apache.sqoop.repository.RepositoryManager;
+import org.apache.sqoop.repository.RepositoryTransaction;
 
 public class ConnectorManager {
 
   private static final Logger LOG = Logger.getLogger(ConnectorManager.class);
 
-  private static List<ConnectorHandler> handlers =
-      new ArrayList<ConnectorHandler>();
+  private static Map<String, ConnectorHandler> handlerMap =
+      new HashMap<String, ConnectorHandler>();
 
   public static synchronized void initialize() {
     if (LOG.isTraceEnabled()) {
@@ -71,10 +76,46 @@ public class ConnectorManager {
       }
 
       for (URL url : connectorConfigs) {
-        handlers.add(new ConnectorHandler(url));
+        ConnectorHandler handler = new ConnectorHandler(url);
+        ConnectorHandler handlerOld =
+            handlerMap.put(handler.getShortName(), handler);
+        if (handlerOld != null) {
+          throw new SqoopException(ConnectorError.CONN_0006,
+              handler + ", " + handlerOld);
+        }
       }
     } catch (IOException ex) {
       throw new SqoopException(ConnectorError.CONN_0001, ex);
+    }
+
+    registerConnectors();
+
+    if (LOG.isInfoEnabled()) {
+      LOG.info("Connectors loaded: " + handlerMap);
+    }
+  }
+
+  private static synchronized void registerConnectors() {
+    Repository repository = RepositoryManager.getRepository();
+
+    RepositoryTransaction rtx = null;
+    try {
+      rtx = repository.getTransaction();
+      rtx.begin();
+      for (String name : handlerMap.keySet()) {
+        String connectorCanonicalName = handlerMap.get(name).getCanonicalName();
+        repository.registerConnector(name, connectorCanonicalName);
+      }
+      rtx.commit();
+    } catch (Exception ex) {
+      if (rtx != null) {
+        rtx.rollback();
+      }
+      throw new SqoopException(ConnectorError.CONN_0007, ex);
+    } finally {
+      if (rtx != null) {
+        rtx.close();
+      }
     }
   }
 

@@ -45,12 +45,14 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
 
   private JdbcRepositoryContext repoContext;
 
+  private Driver driver;
   private GenericObjectPool connectionPool;
   private KeyedObjectPoolFactory statementPool;
   private DataSource dataSource;
 
   private JdbcRepositoryHandler handler;
-  private Driver driver;
+  private JdbcRepositoryTransactionFactory txFactory;
+  private JdbcRepository repository;
 
 
   public JdbcRepositoryProvider() {
@@ -148,12 +150,26 @@ public class JdbcRepositoryProvider implements RepositoryProvider {
         repoContext.getTransactionIsolation().getCode());
 
     dataSource = new PoolingDataSource(connectionPool);
+    txFactory = new JdbcRepositoryTransactionFactory(dataSource);
 
-    handler.initialize(dataSource, repoContext);
+    repoContext.initialize(dataSource, txFactory);
+
+    handler.initialize(repoContext);
+
+    if (repoContext.shouldCreateSchema()) {
+      if (!handler.schemaExists()) {
+        LOG.info("Creating repository schema objects");
+        handler.createSchema();
+      }
+    }
+
+    repository = new JdbcRepository(handler, repoContext);
+
+    LOG.info("JdbcRepositoryProvider initialized");
   }
 
   @Override
   public synchronized Repository getRepository() {
-    return handler.getRepository();
+    return repository;
   }
 }

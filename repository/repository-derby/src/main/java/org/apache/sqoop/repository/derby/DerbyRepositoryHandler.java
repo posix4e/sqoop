@@ -29,7 +29,9 @@ import org.apache.log4j.Logger;
 import org.apache.sqoop.core.SqoopException;
 import org.apache.sqoop.repository.JdbcRepositoryContext;
 import org.apache.sqoop.repository.JdbcRepositoryHandler;
+import org.apache.sqoop.repository.JdbcRepositoryTransactionFactory;
 import org.apache.sqoop.repository.Repository;
+import org.apache.sqoop.repository.model.MConnector;
 
 public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
 
@@ -48,30 +50,14 @@ public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
 
   private JdbcRepositoryContext repoContext;
   private DataSource dataSource;
+  private JdbcRepositoryTransactionFactory txFactory;
 
   @Override
-  public synchronized void initialize(DataSource dataSource,
-      JdbcRepositoryContext ctx) {
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("DerbyRepositoryHandler begin initialization");
-    }
-
-    this.dataSource = dataSource;
+  public synchronized void initialize(JdbcRepositoryContext ctx) {
     repoContext = ctx;
-
-    if (repoContext.shouldCreateSchema()) {
-      if (!schemaExists()) {
-        createSchema();
-      }
-    }
-
+    dataSource = repoContext.getDataSource();
+    txFactory = repoContext.getTransactionFactory();
     LOG.info("DerbyRepositoryHandler initialized.");
-  }
-
-  @Override
-  public synchronized Repository getRepository() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
@@ -113,13 +99,12 @@ public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
     }
   }
 
-
-  private void createSchema() {
-    // TODO implement this
+  public void createSchema() {
+    runQuery(DerbySchemaQuery.QUERY_CREATE_SCHEMA_SQOOP);
+    runQuery(DerbySchemaQuery.QUERY_CREATE_TABLE_SQ_CONNECTOR);
   }
 
-
-  private boolean schemaExists() {
+  public boolean schemaExists() {
     Connection connection = null;
     Statement stmt = null;
     try {
@@ -164,6 +149,54 @@ public class DerbyRepositoryHandler implements JdbcRepositoryHandler {
     return true;
   }
 
+  private void runQuery(String query) {
+    Connection connection = null;
+    Statement stmt = null;
+    try {
+      connection = dataSource.getConnection();
+      stmt = connection.createStatement();
+      if (stmt.execute(query)) {
+        ResultSet rset = stmt.getResultSet();
+        int count = 0;
+        while (rset.next()) {
+          count++;
+        }
+        LOG.info("QUERY(" + query + ") produced unused resultset with "
+            + count + " rows");
+      } else {
+        int updateCount = stmt.getUpdateCount();
+        LOG.info("QUERY(" + query + ") Update count: " + updateCount);
+      }
+      connection.commit();
+    } catch (SQLException ex) {
+      try {
+        connection.rollback();
+      } catch (SQLException ex2) {
+        LOG.error("Unable to rollback transaction", ex2);
+      }
+      throw new SqoopException(DerbyRepoError.DERBYREPO_0003,
+          query, ex);
+    } finally {
+      if (stmt != null) {
+        try {
+          stmt.close();
+        } catch (SQLException ex) {
+          LOG.error("Unable to close statement", ex);
+        }
+        if (connection != null) {
+          try {
+            connection.close();
+          } catch (SQLException ex) {
+            LOG.error("Unable to close connection", ex);
+          }
+        }
+      }
+    }
+  }
 
-
+  @Override
+  public MConnector findConnector(String shortName, Connection conn) {
+    // FIXME Auto-generated method stub
+    return null;
+  }
 }

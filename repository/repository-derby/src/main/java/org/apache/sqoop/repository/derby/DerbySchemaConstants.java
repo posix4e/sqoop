@@ -15,21 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.repository.derby;
 
-import java.sql.Connection;
+public final class DerbySchemaConstants {
 
-import org.apache.sqoop.repository.model.MConnector;
+  public static final String SCHEMA_SQOOP = "SQOOP";
 
-public interface JdbcRepositoryHandler {
+  public static final String TABLE_SQ_CONNECTOR_NAME = "SQ_CONNECTOR";
 
-  public void initialize(JdbcRepositoryContext repoContext);
+  public static final String TABLE_SQ_CONNECTOR = SCHEMA_SQOOP + "."
+      + TABLE_SQ_CONNECTOR_NAME;
 
-  public MConnector findConnector(String shortName, Connection conn);
+  public static final String COLUMN_SQC_NAME = "SQC_NAME";
 
-  public boolean schemaExists();
+  public static final String COLUMN_SQC_CLASS = "SQC_CLASS";
 
-  public void createSchema();
-
-  public void shutdown();
+  private DerbySchemaConstants() {
+    // Disable explicit object creation
+  }
 }

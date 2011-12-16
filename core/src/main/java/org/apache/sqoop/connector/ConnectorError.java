@@ -37,7 +37,13 @@ public enum ConnectorError implements ErrorCode {
   CONN_0004("Connector configuration did not include provider class name"),
 
   /** An exception occurred while attempting to instantiate the connector. */
-  CONN_0005("Failed to instantiate connector class");
+  CONN_0005("Failed to instantiate connector class"),
+
+  /** More than one connectors use the short name resulting in conflict. */
+  CONN_0006("More than one connector uses the same short name"),
+
+  /** The registration of connector during system initialization failed.*/
+  CONN_0007("Connector registration failed");
 
   private final String message;
 

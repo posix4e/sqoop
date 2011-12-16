@@ -20,10 +20,10 @@ package org.apache.sqoop.repository;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.apache.log4j.Logger;
-import org.apache.sqoop.core.ConfigurationConstants;
 import org.apache.sqoop.core.Context;
-import org.apache.sqoop.core.CoreError;
 import org.apache.sqoop.core.SqoopException;
 
 
@@ -41,6 +41,8 @@ public final class JdbcRepositoryContext {
   private final JdbcTransactionIsolation transactionIsolation;
   private final int maxConnections;
 
+  private DataSource dataSource;
+  private JdbcRepositoryTransactionFactory txFactory;
 
   public JdbcRepositoryContext(Context context) {
     this.context = context;
@@ -156,6 +158,23 @@ public final class JdbcRepositoryContext {
 
       LOG.info(sb.toString());
     }
+  }
+
+  void initialize(DataSource source, JdbcRepositoryTransactionFactory factory) {
+    if (source != null || factory != null) {
+      throw new SqoopException(RepositoryError.JDBCREPO_0011);
+    }
+
+    dataSource = source;
+    txFactory = factory;
+  }
+
+  public DataSource getDataSource() {
+    return dataSource;
+  }
+
+  public JdbcRepositoryTransactionFactory getTransactionFactory() {
+    return txFactory;
   }
 
   public String getHandlerClassName() {

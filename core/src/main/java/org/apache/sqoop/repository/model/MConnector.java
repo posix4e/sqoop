@@ -15,21 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sqoop.repository;
+package org.apache.sqoop.repository.model;
 
-import java.sql.Connection;
+public class MConnector {
 
-import org.apache.sqoop.repository.model.MConnector;
+  private String shortName;
+  private String canonicalName;
 
-public interface JdbcRepositoryHandler {
+  public MConnector(String shortName, String canonicalName) {
+    this.shortName = shortName;
+    this.canonicalName = canonicalName;
+  }
 
-  public void initialize(JdbcRepositoryContext repoContext);
+  public String getShortName() {
+    return shortName;
+  }
 
-  public MConnector findConnector(String shortName, Connection conn);
+  public String getCanonicalName() {
+    return canonicalName;
+  }
 
-  public boolean schemaExists();
-
-  public void createSchema();
-
-  public void shutdown();
 }
